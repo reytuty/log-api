@@ -1,20 +1,26 @@
-import { AppDataSource } from "./data-source"
-import { User } from "./entity/Log"
+import express from 'express'
+import { Router, Request, Response } from 'express'
+import { QueueRequestLogHanbler } from './modules/QueueRequestLogHandler';
+import { RequestLogHandler } from './modules/RequestLogHandler';
 
-AppDataSource.initialize().then(async () => {
+const config = {
+    frequency: process.env.FREQUENCY_HANDLER || '100',
+    asyncMode: ( process.env.ASYNC_MODE == 'true' )
+}
+const requestLogHandler = new RequestLogHandler();
+const queueHandler = new QueueRequestLogHanbler(requestLogHandler, parseInt(config.frequency, 10), config.asyncMode )
+const app = express();
+const route = Router();
 
-    console.log("Inserting a new user into the database...")
-    const user = new User()
-    user.firstName = "Timber"
-    user.lastName = "Saw"
-    user.age = 25
-    await AppDataSource.manager.save(user)
-    console.log("Saved a new user with id: " + user.id)
+app.use(express.json());
 
-    console.log("Loading users from the database...")
-    const users = await AppDataSource.manager.find(User)
-    console.log("Loaded users: ", users)
+route.get('/save', async (req:Request, res: Response)=>{
+    const subject: string = req.body?.subject || req.params?.subject;
+    const data: string = ( req.body?.data ) ?  JSON.stringify( req.body.data ) : req.params?.data;
+    let result = await queueHandler.save(subject, data ) ;
+    res.send(result)
+});
 
-    console.log("Here you can setup and run express / fastify / any other framework.")
+app.use(route);
 
-}).catch(error => console.log(error))
+app.listen(8181, ()=> 'server running')

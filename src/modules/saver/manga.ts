@@ -19,7 +19,9 @@ class MangaSave implements ISaverClass{
             return result
         }
         let path = this.prefix+pathSubject.split("/").join(".") ;
-        axios.post()
+        // axios.post(this.endpoint, {
+
+        // })
         result.success = true;
         
         return result;

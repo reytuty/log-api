@@ -2,8 +2,6 @@ import { QueueRequestLog, ISaverClass } from "./QueueRequestLog";
 
 import { Result } from "./Result"
 
-import { LogSave } from './saver/log'
-
 type QueueItem = {
     pathSubject:string, jsonString:string
 }

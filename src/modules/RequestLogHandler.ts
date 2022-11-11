@@ -3,6 +3,8 @@ import { QueueRequestLog, ISaverClass } from "./QueueRequestLog";
 import { Result } from "./Result"
 
 import { LogSave } from './saver/log'
+import { DbSave } from './saver/db'
+
 
 type QueueItem = {
     pathSubject:string, jsonString:string
@@ -15,8 +17,10 @@ export class RequestLogHandler implements ISaverClass{
         this.index = 0;
         this.queueItems = [] ;
         const logSave = new LogSave();
+        const dbSave = new DbSave();
         this.queueHandler = new QueueRequestLog([
-            logSave.save
+            logSave.save,
+            dbSave.save
         ]);
     }
     addQueue(pathSubject:string, jsonString:string):number{
