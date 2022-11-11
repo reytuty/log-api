@@ -3,7 +3,7 @@ import { LogAudits } from "../../entity/LogAudits";
 import { SaveFunction, ISaverClass } from '../QueueRequestLog'
 import { Result } from '../Result'
 
-class DbAuditSave implements ISaverClass{
+class DbLogAudit implements ISaverClass{
     // connection:
     connectionError:boolean = false;
     constructor(){}
@@ -58,5 +58,5 @@ class DbAuditSave implements ISaverClass{
         return result;
     }
 }
-export { DbAuditSave } ;
+export { DbLogAudit } ;
 

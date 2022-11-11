@@ -4,7 +4,7 @@ import { Result } from "./Result"
 
 import { LogSave } from './saver/log'
 import { DbSave } from './saver/db'
-import { DbAuditSave } from './saver/dbAudits'
+import { DbLogAudit } from './saver/dbLogAudit'
 import { FileSave } from "./saver/file";
 
 type QueueItem = {
@@ -20,7 +20,7 @@ export class RequestLogHandler implements ISaverClass{
         this.index = 0;
         const logSave = new LogSave();
         const dbSave = new DbSave();
-        const dbAudit = new DbAuditSave();
+        const dbAudit = new DbLogAudit();
         const fileSave = new FileSave(config.folderLog);
         this.queueHandler = new QueueRequestLog([
             fileSave.save,
