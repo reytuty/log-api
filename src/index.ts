@@ -3,13 +3,21 @@ dotenv.config();
 import express from 'express'
 import { Router, Request, Response } from 'express'
 import { QueueRequestLogHanbler } from './modules/QueueRequestLogHandler';
-import { RequestLogHandler } from './modules/RequestLogHandler';
+import { RequestLogHandler, ConfigRequestHandler } from './modules/RequestLogHandler';
+import { AppDataSource } from "./data-source"
 
 const config = {
     frequency: process.env.FREQUENCY_HANDLER || '100',
-    asyncMode: ( process.env.ASYNC_MODE == 'true' )
+    asyncMode: ( process.env.ASYNC_MODE == 'true' ),
+    folderLog: process.env.FOLDER_LOG || './data/'
 }
-const requestLogHandler = new RequestLogHandler();
+AppDataSource.initialize().then(async () => {
+    console.log('db connected')
+}).catch(error => {
+    console.log(error)
+});
+
+const requestLogHandler = new RequestLogHandler(config);
 const queueHandler = new QueueRequestLogHanbler(requestLogHandler, parseInt(config.frequency, 10), config.asyncMode )
 const app = express();
 const route = Router();

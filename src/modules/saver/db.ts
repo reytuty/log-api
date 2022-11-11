@@ -6,14 +6,7 @@ import { Result } from '../Result'
 class DbSave implements ISaverClass{
     // connection:
     connectionError:boolean = false;
-    constructor(){
-        AppDataSource.initialize().then(async () => {
-            console.log('db connected')
-        }).catch(error => {
-            this.connectionError = true;
-            console.log(error)
-        });
-    }
+    constructor(){}
 
     save : SaveFunction = async (pathSubject:string, jsonString:string) : Promise<Result> => {
         let result = new Result()

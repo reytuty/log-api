@@ -1,6 +1,6 @@
 
 export class Result{
-    success:boolean | undefined;
+    success:boolean = false;
     result: any;
     messages: string[];
     constructor(){

@@ -9,10 +9,10 @@ export class Log {
     @Column()
     created_at: Date
 
-    @Column()
+    @Column("text")
     subject: string
 
-    @Column()
+    @Column("longtext")
     data: string
 
 }

@@ -4,28 +4,29 @@ import { Result } from "./Result"
 
 import { LogSave } from './saver/log'
 import { DbSave } from './saver/db'
-
+import { DbAuditSave } from './saver/dbAudits'
+import { FileSave } from "./saver/file";
 
 type QueueItem = {
     pathSubject:string, jsonString:string
 }
+export type ConfigRequestHandler = {
+    folderLog:string,
+};
 export class RequestLogHandler implements ISaverClass{
     queueHandler : QueueRequestLog;
-    queueItems: QueueItem[];
     index:number;
-    constructor(){
+    constructor(config:ConfigRequestHandler){
         this.index = 0;
-        this.queueItems = [] ;
         const logSave = new LogSave();
         const dbSave = new DbSave();
+        const dbAudit = new DbAuditSave();
+        const fileSave = new FileSave(config.folderLog);
         this.queueHandler = new QueueRequestLog([
-            logSave.save,
-            dbSave.save
+            fileSave.save,
+            dbSave.save,
+            dbAudit.save,
         ]);
-    }
-    addQueue(pathSubject:string, jsonString:string):number{
-        this.queueItems.push({pathSubject, jsonString});
-        return this.index++;
     }
     save(pathSubject:string, jsonString:string): Promise<Result>{
         return this.queueHandler.save( pathSubject, jsonString) ;
