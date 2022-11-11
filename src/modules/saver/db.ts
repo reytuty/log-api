@@ -5,11 +5,22 @@ import { Result } from '../Result'
 
 class DbSave implements ISaverClass{
     // connection:
+    connectionError:boolean = false;
     constructor(){
-        AppDataSource.initialize().then(async () => {}).catch(error => console.log(error));
+        AppDataSource.initialize().then(async () => {
+            console.log('db connected')
+        }).catch(error => {
+            this.connectionError = true;
+            console.log(error)
+        });
     }
 
     save : SaveFunction = async (pathSubject:string, jsonString:string) : Promise<Result> => {
+        let result = new Result()
+        if(this.connectionError){
+            result.messages.push('Db: Imposible to save. Check connection.')
+            return result
+        }
         const user = new Log()
         user.created_at = new Date()
         user.data = jsonString
@@ -17,7 +28,6 @@ class DbSave implements ISaverClass{
         if(!AppDataSource.isInitialized){
             await AppDataSource.initialize();
         }
-        let result = new Result()
         try{
             await AppDataSource.manager.save(user)
             result.success = true;

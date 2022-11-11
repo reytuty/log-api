@@ -1,6 +1,6 @@
 import { QueueRequestLog, ISaverClass } from "./QueueRequestLog";
 
-import { Result } from "./Result"
+import { Result } from "./Result";
 
 type QueueItem = {
     pathSubject:string, jsonString:string
@@ -17,7 +17,7 @@ export class QueueRequestLogHanbler implements ISaverClass{
         this.working = false;
         this.queueItems = [] ;
         this.handler = handler;
-        this.intervalIndex = setInterval(this.handlerItem, frequencyToHandler) ;
+        this.intervalIndex = setInterval(()=>{this.handlerItem()}, frequencyToHandler) ;
         this.asyncMode = asyncMode;
     }
     async save(pathSubject:string, jsonString:string): Promise<Result>{
@@ -32,20 +32,25 @@ export class QueueRequestLogHanbler implements ISaverClass{
         this.queueItems.push({pathSubject, jsonString});
         return result;
     }
-    async handlerItem():Promise<void>{
-        if(this.queueItems.length == 0 || this.working){
+    handlerItem():void{
+        if(this.working || !this.queueItems || this.queueItems.length == 0){
             return;
         }
         //save it is working
         this.working = true
         //get next item of queue
         let item = this.queueItems.shift() as QueueItem;
-        let saveResult: Promise<Result> = this.save(item.pathSubject, item.jsonString) ;
+        let saveResult: Promise<Result> = this.handler.save(item.pathSubject, item.jsonString) ;
         if(!this.asyncMode){
             this.working = false
             return;
         }
-        await saveResult;
-        this.working = false
+        const refThis = this;
+        saveResult.then(r=>{
+            refThis.working = false
+        }).catch(e=>{
+            console.log(e);
+            refThis.working = false
+        })
     }
 }
